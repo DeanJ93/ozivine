@@ -5,6 +5,7 @@ from rich.console import Console
 from rich.padding import Padding
 from rich.text import Text
 from datetime import datetime
+import os
 
 #   Ozivine: Downloader for Australian & New Zealand FTA services
 #   Author: billybanana
@@ -16,6 +17,9 @@ from datetime import datetime
 #   3. Fetch Decryption Keys: Uses the PSSH and license URL to request and retrieve the Widevine decryption keys.
 #   4. Print Download Information: Outputs the MPD URL, license URL, PSSH, and decryption keys required for downloading and decrypting the video content.
 #   5. Note: this script functions for both encrypted and non-encrypted video files.
+
+# N_m3u8DLRE = os.environ['N_m3u8DL-RE']
+print(os.environ['N_m3u8DL-RE'])
 
 console = Console()
 __version__ = "1.5"  # Replace with the actual version

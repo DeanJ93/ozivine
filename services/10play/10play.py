@@ -64,6 +64,7 @@ def extract_video_details(video_id, token):
     auth_headers['Authorization'] = token
 
     response = requests.get(video_api_url, headers=auth_headers)
+    print(response)
     if response.status_code == 200:
         video_data = response.json()
         if 'playbackApiEndpoint' in video_data:
@@ -135,7 +136,7 @@ def format_file_name(video_data):
 
 # Function to format and display download command
 def display_download_command(manifest_url, formatted_file_name, downloads_path):
-    download_command = f"""N_m3u8DL-RE "{manifest_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" """
+    download_command = f"""{os.environ['N_m3u8DL-RE']} "{manifest_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" """
     print(f"{bcolors.LIGHTBLUE}M3U8 URL: {bcolors.ENDC}{manifest_url}")
     print(f"{bcolors.YELLOW}DOWNLOAD COMMAND: {bcolors.ENDC}")
     print(download_command)
