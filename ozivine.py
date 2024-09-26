@@ -1,3 +1,5 @@
+from operator import methodcaller
+from re import U
 import sys
 import importlib
 import yaml
@@ -6,6 +8,7 @@ from rich.padding import Padding
 from rich.text import Text
 from datetime import datetime
 import os
+from flask import Flask, render_template, request, url_for
 
 #   Ozivine: Downloader for Australian & New Zealand FTA services
 #   Author: billybanana
@@ -19,7 +22,7 @@ import os
 #   5. Note: this script functions for both encrypted and non-encrypted video files.
 
 # N_m3u8DLRE = os.environ['N_m3u8DL-RE']
-print(os.environ['N_m3u8DL-RE'])
+# print(os.environ['N_m3u8DL-RE'])
 
 console = Console()
 __version__ = "1.5"  # Replace with the actual version
@@ -59,7 +62,7 @@ def load_config():
     with open('config.yaml', 'r') as file:
         return yaml.safe_load(file)
 
-def main():
+def main(video_url: str) -> None:
     print_ascii_art(version=__version__)  # Display the ASCII art and version info
 
     config = load_config()
@@ -68,7 +71,7 @@ def main():
     cookies_path = config.get('cookies_path')
     credentials = config.get('credentials', {})
 
-    video_url = input(f"{bcolors.LIGHTBLUE}Enter the video URL: {bcolors.ENDC}")
+    # video_url = input(f"{bcolors.LIGHTBLUE}Enter the video URL: {bcolors.ENDC}")
 
     if video_url.startswith("https://www.9now.com.au"):
         service_module = "services.9now.9now"
@@ -108,5 +111,18 @@ def main():
     except Exception as e:
         print(f"{bcolors.RED}Error importing or running the service module: {e}{bcolors.ENDC}")
 
+
+app = Flask(__name__)
+
+@app.route("/download_video", methods=['POST'])
+def recieve_url():
+    url = request.form['url']
+    main(video_url=url)
+    return render_template("index.html")
+
+@app.route("/")
+def form():
+    return render_template("index.html")
+
 if __name__ == "__main__":
-    main()
+    app.run(debug=True)
