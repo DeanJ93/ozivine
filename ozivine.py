@@ -1,3 +1,4 @@
+from ipaddress import ip_address
 from operator import methodcaller
 from re import U
 import sys
@@ -125,4 +126,4 @@ def form():
     return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)

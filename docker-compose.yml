@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  10play:
+    build: .
+    container_name: 10play_container
+    ports:
+      - "5000:5000"
+    environment:
+      N_m3u8DL-RE: "/app/linux/N_m3u8DL-RE_Beta_linux-x64/N_m3u8DL-RE"
+    volumes:
+      - .:/app  # Mounts the current directory to /app in the container
+      - C:\Users\deanj\Downloads:/app/downloads  # Mounts the local drive to /mnt/data in the container
+    stdin_open: true
+    tty: true

@@ -1,5 +1,5 @@
 downloads_path: "/app/downloads" # Example paths
-wvd_device_path: "C:/YourPath/wvd/your_device_name.wvd"
+# wvd_device_path: "C:/YourPath/wvd/your_device_name.wvd"
 # cookies_path: "C:/YourPath/Ozivine/cookies/cookies.txt"
 
 credentials:
