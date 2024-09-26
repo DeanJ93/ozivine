@@ -1,3 +1,4 @@
+from site import USER_SITE
 import requests
 import datetime as dt
 import base64
@@ -141,7 +142,8 @@ def display_download_command(manifest_url, formatted_file_name, downloads_path):
     print(f"{bcolors.YELLOW}DOWNLOAD COMMAND: {bcolors.ENDC}")
     print(download_command)
     
-    user_input = input("Do you wish to download? Y or N: ").strip().lower()
+    # user_input = input("Do you wish to download? Y or N: ").strip().lower()
+    user_input = 'y'
     if user_input == 'y':
         subprocess.run(download_command, shell=True)
 
