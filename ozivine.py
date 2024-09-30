@@ -1,8 +1,7 @@
-from ipaddress import ip_address
-from operator import methodcaller
 from re import U
 import sys
 import importlib
+from urllib import response
 import yaml
 from rich.console import Console
 from rich.padding import Padding
@@ -10,6 +9,7 @@ from rich.text import Text
 from datetime import datetime
 import os
 from flask import Flask, render_template, request, url_for
+import threading
 
 #   Ozivine: Downloader for Australian & New Zealand FTA services
 #   Author: billybanana
@@ -118,7 +118,9 @@ app = Flask(__name__)
 @app.route("/download_video", methods=['POST'])
 def recieve_url():
     url = request.form['url']
-    main(video_url=url)
+    thread = threading.Thread(target=main, args=(url,))
+    thread.start()
+    # main(video_url=url)
     return render_template("index.html")
 
 @app.route("/")
