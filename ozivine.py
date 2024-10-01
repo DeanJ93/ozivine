@@ -8,8 +8,9 @@ from rich.padding import Padding
 from rich.text import Text
 from datetime import datetime
 import os
-from flask import Flask, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for
 import threading
+import ruamel.yaml
 
 #   Ozivine: Downloader for Australian & New Zealand FTA services
 #   Author: billybanana
@@ -115,6 +116,15 @@ def main(video_url: str) -> None:
 
 app = Flask(__name__)
 
+def credentials_exist() -> bool:
+    yaml = ruamel.yaml.YAML()
+    with open('config.yaml') as fp:
+        data = yaml.load(fp)
+        if data['credentials']['10play'] == "username:password" or not data['credentials']['10play']:
+            return False
+        else:
+            return True
+
 @app.route("/download_video", methods=['POST'])
 def recieve_url():
     url = request.form['url']
@@ -123,9 +133,35 @@ def recieve_url():
     # main(video_url=url)
     return render_template("index.html")
 
+@app.route("/update_credentials", methods=['POST'])
+def update_credentials():
+    yaml = ruamel.yaml.YAML()
+    with open('config.yaml') as fp:
+        data = yaml.load(fp)
+
+    # Ensure 'credentials' and '10play' keys exist in the dictionary
+    if 'credentials' not in data or '10play' not in data['credentials']:
+        return "Error: '10play' key not found in the configuration", 400
+
+    # Update the '10play' credentials with new username and password
+    data['credentials']['10play'] = f"{request.form['username']}:{request.form['password']}"
+
+    # Save the updated data back to the file
+    with open('config.yaml', 'w') as fp:
+        yaml.dump(data, fp)
+
+    return redirect(url_for('home'))
+
 @app.route("/")
-def form():
-    return render_template("index.html")
+def home():
+    if credentials_exist():
+        return render_template("index.html")
+    else:
+        return redirect(url_for('settings'))
+
+@app.route("/settings")
+def settings():
+    return render_template("settings.html")
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=7023)

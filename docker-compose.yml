@@ -5,7 +5,7 @@ services:
     build: .
     container_name: 10play_container
     ports:
-      - "5000:5000"
+      - "7023:7023"
     environment:
       N_m3u8DL-RE: "/app/linux/N_m3u8DL-RE_Beta_linux-x64/N_m3u8DL-RE"
     volumes:

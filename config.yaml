@@ -1,7 +1,7 @@
-downloads_path: "/app/downloads" # Example paths
+downloads_path: /app/downloads
 # wvd_device_path: "C:/YourPath/wvd/your_device_name.wvd"
 # cookies_path: "C:/YourPath/Ozivine/cookies/cookies.txt"
 
 credentials:
-  10play: deanj.dev@gmail.com:k$j9uAbB6U # Replace with your own credentials
+  10play: username:password # Replace with your own credentials
   # tvnz: username:password

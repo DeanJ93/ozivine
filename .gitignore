@@ -3,6 +3,20 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Exclude folders
+/archive
+/venv
+/downloads
+/.idea
+/Bento4-SDK-1-6-0-641.x86_64-microsoft-win32
+/ffmpeg-2024-09-05-git-3d0d0f68d5-essentials_build
+/mkvtoolnix-64-bit-87.0
+/N_m3u8DL-RE_Beta_win-x64_20240828
+
+# Exclude specific files
+*.log
+*.env
+
 # User-specific files
 *.rsuser
 *.suo
@@ -361,3 +375,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+test.py

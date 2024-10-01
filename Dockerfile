@@ -21,7 +21,7 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE 7023
 
 CMD [ "python", "./ozivine.py" ]
 

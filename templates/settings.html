@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>10Play Credentials</h1>
+<form id="cred_form" action="{{url_for('update_credentials')}}" method="POST">
+    <div class="mb-3 form-check">
+    <input placeholder="username" type="text" id="username" name="username"><br><br>
+    <input placeholder="Password" type="password" id="password" name="password"><br><br>
+    </div>
+    <div class="mb-3 form-check">
+    <button type="submit" class="btn btn-primary btn-block btn-large">Update</button>
+    </div>
+</form>
+{% endblock %}
