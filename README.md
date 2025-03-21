@@ -16,6 +16,8 @@ You will need a 10Play account.
 
 ### Docker Run
 
+https://hub.docker.com/r/deanj93/ozivine-10play
+
 docker run -d \
   --name=10PlayDownloader \
   -p 7023:7023 \
