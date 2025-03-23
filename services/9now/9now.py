@@ -8,6 +8,7 @@ from pywidevine.device import Device
 from pywidevine.pssh import PSSH
 import base64
 import binascii
+import os
 
 #   9Now Video Downloader
 #   Author: billybanana
@@ -210,7 +211,7 @@ def get_download_command(video_url, downloads_path, wvd_device_path):
                     print(f"{bcolors.GREEN}KEYS: {bcolors.ENDC}--key {key}")
                 print(f"{bcolors.YELLOW}DOWNLOAD COMMAND:{bcolors.ENDC}")
                 formatted_file_name = f"{series_name.title().replace('-', '.').replace(' ', '.').replace('_', '.').replace('/', '.').replace(':', '.')}.{season}{episode}.{max_height}p.9NOW.WEB-DL.AAC2.0.H.264"
-                download_command = f"""N_m3u8DL-RE "{mpd_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" --key """ + ' --key '.join(keys)
+                download_command = f"""{os.environ['N_m3u8DL-RE']} "{mpd_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" --key """ + ' --key '.join(keys)
                 print(download_command)
         else:
             # Handling for unencrypted videos with m3u8
@@ -222,7 +223,7 @@ def get_download_command(video_url, downloads_path, wvd_device_path):
                 print(f"{bcolors.LIGHTBLUE}M3U8 URL: {bcolors.ENDC}{m3u8_url}")
                 print(f"{bcolors.YELLOW}DOWNLOAD COMMAND:{bcolors.ENDC}")
                 formatted_file_name = f"{series_name.title().replace('-', '.').replace(' ', '.').replace('_', '.').replace('/', '.').replace(':', '.')}.{season}{episode}.{max_height}p.9NOW.WEB-DL.AAC2.0.H.264"
-                download_command = f"""N_m3u8DL-RE "{m3u8_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" """
+                download_command = f"""{os.environ['N_m3u8DL-RE']} "{m3u8_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" """
                 print(download_command)
             else:
                 print("No suitable source found for unencrypted video")
@@ -230,9 +231,7 @@ def get_download_command(video_url, downloads_path, wvd_device_path):
         print("No 'sources' found in the response")
     
     if download_command:
-        user_input = input("Do you wish to download? Y or N: ").strip().lower()
-        if user_input == 'y':
-            subprocess.run(download_command, shell=True)
+        subprocess.run(download_command, shell=True)
 
 # Main execution flow
 def main(video_url, downloads_path, wvd_device_path):
