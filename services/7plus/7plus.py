@@ -276,15 +276,12 @@ def get_download_command(info, show_title, season_episode_tag, downloads_path, w
             if season_episode_tag:
                 formatted_file_name += f".{season_episode_tag}"
             formatted_file_name += f".{resolution}.7PLUS.WEB-DL.AAC2.0.H.264"
-            download_command = f"""N_m3u8DL-RE "{url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" """
+            download_command = f"""{os.environ['N_m3u8DL-RE']} "{url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" """
             
             print(f"{bcolors.LIGHTBLUE}M3U8 URL: {bcolors.ENDC}{url}")
             print(f"{bcolors.YELLOW}DOWNLOAD COMMAND: {bcolors.ENDC}")
             print(download_command)
-            
-            user_input = input("Do you wish to download? Y or N: ").strip().lower()
-            if user_input == 'y':
-                subprocess.run(download_command, shell=True)
+            subprocess.run(download_command, shell=True)
         else:
             print(f"{bcolors.FAIL}Failed to retrieve necessary information for download{bcolors.ENDC}")       
 

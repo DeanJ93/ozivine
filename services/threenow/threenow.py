@@ -6,6 +6,7 @@ from pywidevine.device import Device
 from pywidevine.pssh import PSSH
 import subprocess
 from datetime import datetime
+import os
 
 #   Ozivine: ThreeNow Video Downloader
 #   Author: billybanana
@@ -291,14 +292,11 @@ def get_download_command(video_url, downloads_path, wvd_device_path):
                         manifest_url = source['src']
                         break
                 formatted_filename = get_formatted_filename(show_id, video_id, "720p")
-                download_command = f"""N_m3u8DL-RE "{manifest_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_filename}" """
+                download_command = f"""N{os.environ['N_m3u8DL-RE']} "{manifest_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_filename}" """
                 print(f"{bcolors.LIGHTBLUE}M3U8 URL: {bcolors.ENDC}{manifest_url}")
                 print(f"{bcolors.YELLOW}DOWNLOAD COMMAND:{bcolors.ENDC}")
                 print(download_command)
-
-                user_input = input("Do you wish to download? Y or N: ").strip().lower()
-                if user_input == 'y':
-                    subprocess.run(download_command, shell=True)
+                subprocess.run(download_command, shell=True)
     except Exception as e:
         print(f"Error: {e}")
 

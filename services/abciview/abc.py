@@ -5,6 +5,7 @@ import binascii
 import subprocess
 from xml.etree import ElementTree as ET
 from pywidevine import Cdm, Device, PSSH
+import os
 
 #   Ozivine: ABC iView Video Downloader
 #   Author: billybanana
@@ -187,13 +188,11 @@ def main(video_url, downloads_path, wvd_device_path):
                     for key in formatted_keys:
                         print(f"{bcolors.GREEN}KEYS: {bcolors.ENDC}--key {key}")
                     print(f"{bcolors.YELLOW}DOWNLOAD COMMAND:{bcolors.ENDC}")
-                    download_command = f"""N_m3u8DL-RE "{mpd_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" --key """ + ' --key '.join(formatted_keys)
+                    download_command = f"""{os.environ['N_m3u8DL-RE']} "{mpd_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" --key """ + ' --key '.join(formatted_keys)
                     print(download_command)
                     
                     if download_command:
-                        user_input = input("Do you wish to download? Y or N: ").strip().lower()
-                        if user_input == 'y':
-                            subprocess.run(download_command, shell=True)
+                        subprocess.run(download_command, shell=True)
                 else:
                     print("Failed to get license keys")
             else:

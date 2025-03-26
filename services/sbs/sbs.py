@@ -1,6 +1,7 @@
 import requests
 import re
 import subprocess
+import os
 
 #   Ozivine: SBS On Demand Video Downloader
 #   Author: billybanana
@@ -107,15 +108,12 @@ def extract_info(video_url):
 
 # Function to format and display download command
 def display_download_command(manifest_url, formatted_file_name, downloads_path):
-    download_command = f"""N_m3u8DL-RE "{manifest_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" """
+    download_command = f"""{os.environ['N_m3u8DL-RE']} "{manifest_url}" --select-video best --select-audio best --select-subtitle all -mt -M format=mkv --save-dir "{downloads_path}" --save-name "{formatted_file_name}" """
     
     print(f"{bcolors.LIGHTBLUE}M3U8 URL: {bcolors.ENDC}{manifest_url}")
     print(f"{bcolors.YELLOW}DOWNLOAD COMMAND: {bcolors.ENDC}")
     print(download_command)
-    
-    user_input = input("Do you wish to download? Y or N: ").strip().lower()
-    if user_input == 'y':
-        subprocess.run(download_command, shell=True)
+    subprocess.run(download_command, shell=True)
     
 # Main function
 def main(video_url, downloads_path):
