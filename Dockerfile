@@ -11,7 +11,7 @@ RUN apt-get install -y libicu-dev
 # Install ffmpeg
 RUN apt-get install -y ffmpeg
 
-ENV N_m3u8DL-RE="/app/linux/N_m3u8DL-RE_Beta_linux-x64/N_m3u8DL-RE"
+ENV N_m3u8DL-RE="/app/linux/N_m3u8DL-RE_v0.5.1-beta_linux-x64_20251029/N_m3u8DL-RE"
 
 # export PATH=$PATH:app/linux/ffmpeg-6.1.1
 
