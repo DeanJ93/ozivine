@@ -1,3 +1,4 @@
+from email.mime import base
 from site import USER_SITE
 import requests
 import datetime as dt
@@ -33,14 +34,15 @@ class bcolors:
     YELLOW = '\033[93m'
     ORANGE = '\033[93m'
 
+base_url = "https://10.com.au"
 # URLs and Headers
-login_url = 'https://10play.com.au/api/user/auth'
+login_url = f'{base_url}/api/user/auth'
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
     'Accept': 'application/json, text/plain, */*',
     'Accept-Language': 'en-US,en;q=0.9',
-    'Origin': 'https://10play.com.au',
-    'Referer': 'https://10play.com.au/'
+    'Origin': base_url,
+    'Referer': base_url + '/'
 }
 
 # Function to get bearer token
@@ -60,12 +62,11 @@ def get_bearer_token(username, password):
 
 # Function to extract video details and videoId
 def extract_video_details(video_id, token):
-    video_api_url = f'https://10play.com.au/api/v1/videos/{video_id}'
+    video_api_url = f'{base_url}/api/v1/videos/{video_id}'
     auth_headers = headers.copy()
     auth_headers['Authorization'] = token
 
     response = requests.get(video_api_url, headers=auth_headers)
-    print(response)
     if response.status_code == 200:
         video_data = response.json()
         if 'playbackApiEndpoint' in video_data:
@@ -74,30 +75,60 @@ def extract_video_details(video_id, token):
             if playback_response.status_code == 200:
                 playback_data = playback_response.json()
 
-                # Get the videoId (this is the key information we need now)
-                if 'dai' in playback_data and 'videoId' in playback_data['dai']:
-                    return playback_data['dai']['videoId'], video_data  # Also return video_data for filename formatting
+                # Try to get the HLS URL directly from the playback response
+                source = playback_data.get('source', '')
+                hls_url = source if (source and source != 'https://' and source.startswith('https://')) else None
+                if not hls_url:
+                    hls_url = (playback_data.get('hlsUrl')
+                               or playback_data.get('hls')
+                               or playback_data.get('streamUrl'))
+
+                dai_info = playback_data.get('dai', {})
+                dai_video_id = dai_info.get('videoId')
+                content_source_id = dai_info.get('contentSourceId')
+
+                # If no direct HLS URL, use Google DAI to obtain the stream
+                if not hls_url and dai_video_id and content_source_id:
+                    print(f"{bcolors.OKBLUE}Requesting stream from Google DAI...{bcolors.ENDC}")
+                    hls_url = get_dai_stream_url(content_source_id, dai_video_id)
+
+                if hls_url:
+                    return dai_video_id, video_data, hls_url
                 else:
-                    print(f"{bcolors.FAIL}Missing videoId in playback data{bcolors.ENDC}")
+                    print(f"{bcolors.FAIL}Missing videoId and hlsUrl in playback data{bcolors.ENDC}")
             else:
                 print(f"{bcolors.FAIL}Failed to fetch playback data{bcolors.ENDC}")
         else:
             print(f"{bcolors.FAIL}playbackApiEndpoint missing in video data{bcolors.ENDC}")
     else:
-        print(f"{bcolors.FAIL}Failed to fetch video details{bcolors.ENDC}")
+        print(f"{bcolors.FAIL}Failed to fetch video details (status {response.status_code}){bcolors.ENDC}")
     
-    return None, None
+    return None, None, None
+
+# Function to get HLS stream URL from Google DAI
+def get_dai_stream_url(content_source_id, video_id):
+    dai_url = f'https://dai.google.com/ondemand/v1/hls/content/{content_source_id}/vid/{video_id}/stream'
+    response = requests.post(dai_url, json={'format': 'hls'}, headers={'Content-Type': 'application/json'})
+    if response.status_code in (200, 201):
+        data = response.json()
+        return data.get('hls_master_playlist') or data.get('stream_manifest')
+    return None
 
 # Function to extract video ID from URL
 def extract_video_id(url):
     match = re.search(r'/([^/]+)/?$', url)
     return match.group(1) if match else None
 
-# Function to retrieve manifest URL using the new config endpoint with correct headers
+# Function to retrieve manifest URL using the config endpoint with correct headers
 def get_manifest(video_id):
     CONFIG = "https://vod.ten.com.au/config/androidapps-v2"
     
     config = requests.get(CONFIG).json()
+
+    if not config or "endpoints" not in config:
+        print(f"{bcolors.FAIL}Config endpoint returned no data. The 10Play VOD API may have changed.{bcolors.ENDC}")
+        return None
+
     url = config["endpoints"]["videos"]["server"] + config["endpoints"]["videos"]["methods"]["getVideobyIDs"]
     url = url.replace("[ids]", video_id).replace("[state]", "AU")  # Add video id and state (geolocation)
     
@@ -159,16 +190,23 @@ def main(video_url, downloads_path, credentials):
     token = get_bearer_token(username, password)
     if token:
         print(f"{bcolors.OKGREEN}Login successful, token obtained{bcolors.ENDC}")
-        extracted_video_id, video_data = extract_video_details(video_id, token)
+        extracted_video_id, video_data, direct_hls_url = extract_video_details(video_id, token)
         
-        if extracted_video_id:
+        if direct_hls_url:
+            # Use the HLS URL returned directly from the playback API
+            manifest_url = direct_hls_url
+        elif extracted_video_id:
+            # Fall back to the VOD config-based manifest lookup
             manifest_url = get_manifest(extracted_video_id)
-            if manifest_url:
-                formatted_file_name = format_file_name(video_data)
-                display_download_command(manifest_url, formatted_file_name, downloads_path)
-            else:
-                print(f"{bcolors.FAIL}Failed to retrieve manifest URL{bcolors.ENDC}")
         else:
-            print(f"{bcolors.FAIL}Failed to extract video ID{bcolors.ENDC}")
+            manifest_url = None
+
+        if manifest_url and video_data:
+            formatted_file_name = format_file_name(video_data)
+            display_download_command(manifest_url, formatted_file_name, downloads_path)
+        elif not (extracted_video_id or direct_hls_url):
+            print(f"{bcolors.FAIL}Failed to extract video details{bcolors.ENDC}")
+        else:
+            print(f"{bcolors.FAIL}Failed to retrieve manifest URL{bcolors.ENDC}")
     else:
         print(f"{bcolors.FAIL}Login failed{bcolors.ENDC}")

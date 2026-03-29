@@ -1,10 +1,12 @@
-FROM python
+FROM python:3.11-slim
 
 # Install development packages for lxml
 # RUN apk add --no-cache libxml2-dev libxslt-dev
 
 # Update the package list
 RUN apt-get update
+
+RUN apt-get install -y libicu-dev
 
 # Install ffmpeg
 RUN apt-get install -y ffmpeg

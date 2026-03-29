@@ -91,7 +91,7 @@ def main(video_url: str) -> None:
         service_module = "services.abciview.abc"
         print(f"{bcolors.LIGHTBLUE}Ozivine..........initiating ABC iView{bcolors.ENDC}")
         args = (video_url, downloads_path, wvd_device_path)
-    elif video_url.startswith("https://10play.com.au/"):
+    elif video_url.startswith("https://10.com.au/"):
         service_module = "services.10play.10play"
         print(f"{bcolors.LIGHTBLUE}Ozivine..........initiating 10Play{bcolors.ENDC}")
         args = (video_url, downloads_path, credentials.get("10play")) 
