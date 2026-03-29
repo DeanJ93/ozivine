@@ -7,7 +7,7 @@ services:
     ports:
       - "7023:7023"
     environment:
-      N_m3u8DL-RE: "/app/linux/N_m3u8DL-RE_Beta_linux-x64/N_m3u8DL-RE"
+      N_m3u8DL-RE: "/app/linux/N_m3u8DL-RE_v0.5.1-beta_linux-x64_20251029/N_m3u8DL-RE"
     volumes:
       - .:/app  # Mounts the current directory to /app in the container
       - C:\Users\deanj\Downloads:/app/downloads  # Mounts the local drive to /mnt/data in the container
